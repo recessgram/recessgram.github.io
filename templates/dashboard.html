@@ -82,15 +82,15 @@
             </form>
             <div class="list-container">
                 {% for post in feed %}
-                <div class="box-item">
-                    <div style="font-size:0.8em; color:#777; display:flex; align-items:center;">
-                        <!-- Apple-style Badge inside Status Posts -->
-                        <span class="avatar-badge avatar-feed">{{ post.avatar }}</span>
-                        <strong>@{{ post.username }}</strong> &nbsp;•&nbsp; {{ post.timestamp }}
-                    </div>
-                    <p style="margin: 8px 0 0 40px; font-size:1.05em;">{{ post.content }}</p>
-                </div>
-                {% endfor %}
+			<div class="box-item">
+    			<div style="font-size:0.8em; color:#777; display:flex; align-items:center;">
+        			<!-- This is where your custom circular avatar text or emoji renders -->
+        			<span class="avatar-badge avatar-feed">{{ post.avatar }}</span>
+      			  <strong>@{{ post.username }}</strong> &nbsp;•&nbsp; {{ post.timestamp }}
+  			  </div>
+ 			   <p style="margin: 8px 0 0 40px; font-size:1.05em;">{{ post.content }}</p>
+			</div>
+		{% endfor %}
             </div>
         </div>
 
@@ -115,15 +115,15 @@
             {% endif %}
             <div class="list-container">
                 {% for chat in chats %}
-                <div class="box-item {% if chat_mode_friend %}friend-item{% else %}chat-item{% endif %}">
-                    <div style="font-size:0.8em; display:flex; align-items:center; {% if chat_mode_friend %}color:#e91e63;{% else %}color:#ff9800;{% endif %}">
-                        <!-- Apple-style Badge inside Chat Bubbles -->
-                        <span class="avatar-badge {% if chat_mode_friend %}avatar-friend-chat{% else %}avatar-chat{% endif %}">{{ chat.avatar }}</span>
-                        <strong>@{{ chat.username }}</strong> &nbsp;•&nbsp; {{ chat.timestamp }}
-                    </div>
-                    <p style="margin: 6px 0 0 34px; font-size:1em; color:#222;">{{ chat.message }}</p>
-                </div>
-                {% endfor %}
+<div class="box-item {% if chat_mode_friend %}friend-item{% else %}chat-item{% endif %}">
+    <div style="font-size:0.8em; display:flex; align-items:center; {% if chat_mode_friend %}color:#e91e63;{% else %}color:#ff9800;{% endif %}">
+        <!-- This is where your custom circular chat bubble avatar text or emoji renders -->
+        <span class="avatar-badge {% if chat_mode_friend %}avatar-friend-chat{% else %}avatar-chat{% endif %}">{{ chat.avatar }}</span>
+        <strong>@{{ chat.username }}</strong> &nbsp;•&nbsp; {{ chat.timestamp }}
+    </div>
+    <p style="margin: 6px 0 0 34px; font-size:1em; color:#222;">{{ chat.message }}</p>
+</div>
+{% endfor %}
             </div>
         </div>
     </div>
