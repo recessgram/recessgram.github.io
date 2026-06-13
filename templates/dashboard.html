@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Recessgram - Dashboard</title>
+    <style>
+        body { font-family: 'Comic Sans MS', sans-serif; background: #e0f7fa; margin: 0; padding: 20px; }
+        .navbar { background: #ff4081; padding: 15px; color: white; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .navbar a { color: white; text-decoration: none; font-weight: bold; background: rgba(0,0,0,0.2); padding: 5px 10px; border-radius: 5px; }
+        .layout { display: flex; gap: 20px; max-width: 1400px; margin: auto; }
+        .sidebar { width: 260px; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); height: 80vh; display: flex; flex-direction: column; }
+        .column { flex: 1; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); height: 80vh; display: flex; flex-direction: column; }
+        .list-container { flex: 1; overflow-y: auto; margin-top: 15px; padding-right: 5px; }
+        .box-item { background: #f9f9f9; padding: 12px; border-radius: 10px; margin-bottom: 12px; border-left: 5px solid #00bcd4; }
+        .chat-item { border-left-color: #ff9800; }
+        .friend-item { border-left-color: #e91e63; }
+        .link-item { display: block; padding: 10px; margin: 5px 0; background: #f0f0f0; border-radius: 5px; color: #333; text-decoration: none; font-weight: bold; font-size: 0.9em; }
+        .link-item.active { background: #ff4081; color: white; }
+        .link-item.friend-link.active { background: #e91e63; color: white; }
+        textarea, input[type="text"] { width: 100%; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
+        textarea { height: 50px; margin-bottom: 8px; resize: none; }
+        input[type="text"] { padding: 8px; margin-bottom: 8px; }
+        button { background: #4caf50; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h2>🎒 Recessgram Dashboard</h2>
+        <div>
+            👋 @{{ current_username }} | 
+            <a href="/parent-portal" style="background: #4caf50; margin-right: 10px;">🔑 Parent Portal</a>
+            <a href="/logout">Log Out</a>
+        </div>
+    </div>
+    <div class="layout">
+        <div class="sidebar">
+            <h3>📚 Subjects & Chats</h3>
+            <div style="overflow-y: auto; max-height: 35%;">
+                {% for chan in channels %}
+                <a href="/dashboard?username={{ current_username }}&channel_id={{ chan.id }}" 
+                   class="link-item {% if chan.id == current_channel_id and not chat_mode_friend %}active{% endif %}">
+                    # {{ chan.name }}
+                </a>
+                {% endfor %}
+            </div>
+            <form action="/web-create-channel" method="POST" style="margin-top: 5px;">
+                <input type="hidden" name="username" value="{{ current_username }}">
+                <input type="text" name="channel_name" placeholder="New Chat Subject..." required style="padding:5px; font-size:0.8em;">
+                <button type="submit" style="background:#00bcd4; padding:5px; font-size:0.8em; color:white; border:none; border-radius:3px; cursor:pointer;">Create ➕</button>
+            </form>
+            <hr style="width: 100%; margin: 15px 0;">
+            <h3>👥 Playmates</h3>
+            <div style="overflow-y: auto; flex: 1;">
+                {% for user_profile in users_list %}
+                    {% if user_profile.username != current_username %}
+                    <a href="/dashboard?username={{ current_username }}&target_friend_id={{ user_profile.id }}" 
+                       class="link-item friend-link {% if user_profile.id == active_friend_id and chat_mode_friend %}active{% endif %}">
+                        💬 Chat with @{{ user_profile.username }}
+                    </a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        <div class="column">
+            <h3>📸 Friend Feed</h3>
+            <form action="/web-post" method="POST">
+                <input type="hidden" name="username" value="{{ current_username }}">
+                <input type="hidden" name="channel_id" value="{{ current_channel_id }}">
+                <input type="hidden" name="target_friend_id" value="{{ active_friend_id }}">
+                <input type="hidden" name="chat_mode_friend" value="{{ chat_mode_friend }}">
+                <textarea name="content" placeholder="Share what you are doing..." required></textarea>
+                <button type="submit">Post to Feed ✨</button>
+            </form>
+            <div class="list-container">
+                {% for post in feed %}
+                <div class="box-item">
+                    <div style="font-size:0.8em; color:#777;">@{{ post.username }} • {{ post.timestamp }}</div>
+                    <p style="margin: 5px 0 0 0;">{{ post.content }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="column">
+            {% if chat_mode_friend %}
+                <h3>💬 Friend Chat: @{{ active_friend_name }}</h3>
+                <form action="/web-friend-chat" method="POST">
+                    <input type="hidden" name="username" value="{{ current_username }}">
+                    <input type="hidden" name="target_friend_id" value="{{ active_friend_id }}">
+                    <textarea name="message" placeholder="Send a private note..." required></textarea>
+                    <button type="submit" style="background:#e91e63; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">Send Secret Note 🔐</button>
+                </form>
+            {% else %}
+                <h3>💬 Room Thread: #{{ active_channel_name }}</h3>
+                <form action="/web-chat" method="POST">
+                    <input type="hidden" name="username" value="{{ current_username }}">
+                    <input type="hidden" name="channel_id" value="{{ current_channel_id }}">
+                    <textarea name="message" placeholder="Type a message to this room..." required></textarea>
+                    <button type="submit" style="background:#ff9800; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">Send Message 🚀</button>
+                </form>
+            {% endif %}
+            <div class="list-container">
+                {% for chat in chats %}
+                <div class="box-item {% if chat_mode_friend %}friend-item{% else %}chat-item{% endif %}">
+                    <div style="font-size:0.8em; {% if chat_mode_friend %}color:#e91e63;{% else %}color:#ff9800;{% endif %}">@{{ chat.username }} • {{ chat.timestamp }}</div>
+                    <p style="margin: 5px 0 0 0;">{{ chat.message }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
