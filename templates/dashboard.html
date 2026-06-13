@@ -20,6 +20,12 @@
         textarea { height: 50px; margin-bottom: 8px; resize: none; }
         input[type="text"] { padding: 8px; margin-bottom: 8px; }
         button { background: #4caf50; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; }
+        
+        /* Apple-style circular initial/emoji badge style */
+        .avatar-badge { display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; color: white; font-weight: bold; text-transform: uppercase; vertical-align: middle; }
+        .avatar-feed { width: 32px; height: 32px; font-size: 0.9em; margin-right: 8px; background: #00bcd4; }
+        .avatar-chat { width: 28px; height: 28px; font-size: 0.8em; margin-right: 6px; background: #ff9800; }
+        .avatar-friend-chat { width: 28px; height: 28px; font-size: 0.8em; margin-right: 6px; background: #e91e63; }
     </style>
 </head>
 <body>
@@ -32,6 +38,7 @@
         </div>
     </div>
     <div class="layout">
+        <!-- Sidebar Navigation Panel -->
         <div class="sidebar">
             <h3>📚 Subjects & Chats</h3>
             <div style="overflow-y: auto; max-height: 35%;">
@@ -47,7 +54,9 @@
                 <input type="text" name="channel_name" placeholder="New Chat Subject..." required style="padding:5px; font-size:0.8em;">
                 <button type="submit" style="background:#00bcd4; padding:5px; font-size:0.8em; color:white; border:none; border-radius:3px; cursor:pointer;">Create ➕</button>
             </form>
+            
             <hr style="width: 100%; margin: 15px 0;">
+            
             <h3>👥 Playmates</h3>
             <div style="overflow-y: auto; flex: 1;">
                 {% for user_profile in users_list %}
@@ -60,6 +69,7 @@
                 {% endfor %}
             </div>
         </div>
+        <!-- Central Friend Feed Column -->
         <div class="column">
             <h3>📸 Friend Feed</h3>
             <form action="/web-post" method="POST">
@@ -73,12 +83,18 @@
             <div class="list-container">
                 {% for post in feed %}
                 <div class="box-item">
-                    <div style="font-size:0.8em; color:#777;">@{{ post.username }} • {{ post.timestamp }}</div>
-                    <p style="margin: 5px 0 0 0;">{{ post.content }}</p>
+                    <div style="font-size:0.8em; color:#777; display:flex; align-items:center;">
+                        <!-- Apple-style Badge inside Status Posts -->
+                        <span class="avatar-badge avatar-feed">{{ post.avatar }}</span>
+                        <strong>@{{ post.username }}</strong> &nbsp;•&nbsp; {{ post.timestamp }}
+                    </div>
+                    <p style="margin: 8px 0 0 40px; font-size:1.05em;">{{ post.content }}</p>
                 </div>
                 {% endfor %}
             </div>
         </div>
+
+        <!-- Right Side Thread Column -->
         <div class="column">
             {% if chat_mode_friend %}
                 <h3>💬 Friend Chat: @{{ active_friend_name }}</h3>
@@ -100,8 +116,12 @@
             <div class="list-container">
                 {% for chat in chats %}
                 <div class="box-item {% if chat_mode_friend %}friend-item{% else %}chat-item{% endif %}">
-                    <div style="font-size:0.8em; {% if chat_mode_friend %}color:#e91e63;{% else %}color:#ff9800;{% endif %}">@{{ chat.username }} • {{ chat.timestamp }}</div>
-                    <p style="margin: 5px 0 0 0;">{{ chat.message }}</p>
+                    <div style="font-size:0.8em; display:flex; align-items:center; {% if chat_mode_friend %}color:#e91e63;{% else %}color:#ff9800;{% endif %}">
+                        <!-- Apple-style Badge inside Chat Bubbles -->
+                        <span class="avatar-badge {% if chat_mode_friend %}avatar-friend-chat{% else %}avatar-chat{% endif %}">{{ chat.avatar }}</span>
+                        <strong>@{{ chat.username }}</strong> &nbsp;•&nbsp; {{ chat.timestamp }}
+                    </div>
+                    <p style="margin: 6px 0 0 34px; font-size:1em; color:#222;">{{ chat.message }}</p>
                 </div>
                 {% endfor %}
             </div>
