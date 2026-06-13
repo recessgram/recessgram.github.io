@@ -434,4 +434,5 @@ def web_friend_chat():
 
 if __name__ == '__main__':
     init_db()
-    app.run(host='127.0.0.1', port=9000)
+    # UPDATED: Allows other network devices to connect
+    app.run(host='0.0.0.0', port=9000)
